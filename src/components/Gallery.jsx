@@ -5,23 +5,24 @@ import Popup from "./Popup";
 function Gallery() {
   const [users, setUsers] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [isClick, setIsClick] = useState();
   const [curr, setCurr] = useState();
 
-  const usersstat = async () => {
-    const res = await fetch(`https://www.breakingbadapi.com/api/characters/`);
-    const json = await res.json();
-    setUsers([json][0]);
+  const usersstat = () => {
+    fetch("https://www.breakingbadapi.com/api/characters/")
+      .then((response) => response.json())
+      .then((data) => setUsers(data));
   };
+
   React.useEffect(() => {
-    usersstat();
+    if (!users.length) {
+      usersstat();
+    }
   });
 
   const clicked = (id) => {
-    setIsClick(id);
-    console.log(id);
-    setCurr(users.filter((el) => el.char_id === isClick));
+    setCurr(users.filter((el) => el.char_id === id));
     console.log(curr);
+    console.log(users);
   };
 
   const togglePopup = () => {
@@ -50,14 +51,24 @@ function Gallery() {
           <Popup
             content={
               <div>
-                {curr?.map((item) => (
-                  <div>
-                    <p key={item.char_id}>{item.name}</p>
+                {curr.map((item) => (
+                  <div key={item.char_id}>
+                    <p>Имя: {item.name}</p>
+                    <img
+                      key={item.char_id}
+                      src={item.img}
+                      alt={item.name}
+                      className={classes.popupImg}
+                    />
+                    <p>Ник: {item.nickname}</p>
+                    <p>Актер: {item.portrayed}</p>
+                    <p>День рождения: {item.birthday}</p>
+                    <p data-google-lang="ru">Статус: {item.status}</p>
                   </div>
                 ))}
               </div>
             }
-            handleClose={togglePopup}
+            togglePopup={togglePopup}
           />
         )}
       </div>
